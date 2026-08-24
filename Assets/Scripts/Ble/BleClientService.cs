@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using UnityEngine;
+using UnityEngine.Android;
 
 namespace BleTest
 {
@@ -18,6 +20,9 @@ namespace BleTest
         private AndroidJavaObject _bridge;
         private bool _isInitialized;
 
+        private const float INITIAL_SCAN_DELAY = 1.5f;
+        private const float PERMISSION_TIMEOUT = 15f;
+
         private void Awake()
         {
             if (Instance != null && Instance != this)
@@ -32,10 +37,46 @@ namespace BleTest
         private void Start()
         {
 #if UNITY_ANDROID && !UNITY_EDITOR
-            InitializeBridge();
+            StartCoroutine(PermissionAndInit());
 #else
             Debug.Log("[BleClient] Not on Android - BLE bridge disabled");
 #endif
+        }
+
+        private IEnumerator PermissionAndInit()
+        {
+            // Request BLE permissions (Android 12+ / Quest 3)
+            yield return RequestAndAwait("android.permission.BLUETOOTH_SCAN");
+            yield return RequestAndAwait("android.permission.BLUETOOTH_CONNECT");
+
+            Debug.Log("[BleClient] BLE permissions check done");
+
+            InitializeBridge();
+
+            if (_isInitialized)
+            {
+                yield return new WaitForSeconds(INITIAL_SCAN_DELAY);
+                StartScan();
+            }
+        }
+
+        private IEnumerator RequestAndAwait(string permission)
+        {
+            if (Permission.HasUserAuthorizedPermission(permission))
+                yield break;
+
+            Debug.Log($"[BleClient] Requesting {permission}...");
+            Permission.RequestUserPermission(permission);
+
+            float elapsed = 0f;
+            while (!Permission.HasUserAuthorizedPermission(permission) && elapsed < PERMISSION_TIMEOUT)
+            {
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            if (!Permission.HasUserAuthorizedPermission(permission))
+                Debug.LogWarning($"[BleClient] Permission {permission} not granted after {PERMISSION_TIMEOUT}s — scan may fail");
         }
 
         private void InitializeBridge()
