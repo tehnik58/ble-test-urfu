@@ -105,3 +105,9 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+
+# IDE / OS extras
+.vscode/.idea/
+Thumbs.db
+Desktop.ini
+.DS_Store
