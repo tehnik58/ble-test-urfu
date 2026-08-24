@@ -26,8 +26,8 @@ namespace BleTest
                 return;
             }
 
-            _bleService.OnStateChanged += OnStateChanged;
-            _bleService.OnError += OnError;
+            _bleService.StateChanged += OnStateChanged;
+            _bleService.Error += OnError;
             _currentDelay = _initialDelay;
         }
 
@@ -35,8 +35,8 @@ namespace BleTest
         {
             if (_bleService != null)
             {
-                _bleService.OnStateChanged -= OnStateChanged;
-                _bleService.OnError -= OnError;
+                _bleService.StateChanged -= OnStateChanged;
+                _bleService.Error -= OnError;
             }
         }
 

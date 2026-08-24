@@ -24,9 +24,9 @@ namespace BleTest
                 return;
             }
 
-            _bleService.OnTextReceived += OnTextReceived;
-            _bleService.OnStateChanged += OnStateChanged;
-            _bleService.OnError += OnError;
+            _bleService.TextReceived += OnTextReceived;
+            _bleService.StateChanged += OnStateChanged;
+            _bleService.Error += OnError;
 
             UpdateStatus("disconnected");
             SetTextVisible(false);
@@ -36,9 +36,9 @@ namespace BleTest
         {
             if (_bleService != null)
             {
-                _bleService.OnTextReceived -= OnTextReceived;
-                _bleService.OnStateChanged -= OnStateChanged;
-                _bleService.OnError -= OnError;
+                _bleService.TextReceived -= OnTextReceived;
+                _bleService.StateChanged -= OnStateChanged;
+                _bleService.Error -= OnError;
             }
         }
 

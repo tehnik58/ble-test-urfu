@@ -11,9 +11,9 @@ namespace BleTest
     {
         public static BleClientService Instance { get; private set; }
 
-        public event Action<string> OnTextReceived;
-        public event Action<string> OnStateChanged;   // "scanning", "connecting", "connected", "disconnected"
-        public event Action<string> OnError;
+        public event Action<string> TextReceived;
+        public event Action<string> StateChanged;   // "scanning", "connecting", "connected", "disconnected"
+        public event Action<string> Error;
 
         private AndroidJavaObject _bridge;
         private bool _isInitialized;
@@ -57,7 +57,7 @@ namespace BleTest
             catch (Exception e)
             {
                 Debug.LogError($"[BleClient] Init failed: {e.Message}");
-                OnError?.Invoke("Initialization failed: " + e.Message);
+                Error?.Invoke("Initialization failed: " + e.Message);
             }
         }
 
@@ -76,7 +76,7 @@ namespace BleTest
 #if UNITY_ANDROID && !UNITY_EDITOR
             if (_bridge == null)
             {
-                OnError?.Invoke("Bridge not initialized");
+                Error?.Invoke("Bridge not initialized");
                 return;
             }
             _bridge.Call("startScan");
@@ -112,19 +112,19 @@ namespace BleTest
         public void OnTextReceived(string text)
         {
             Debug.Log($"[BleClient] Text received: {text}");
-            OnTextReceived?.Invoke(text);
+            TextReceived?.Invoke(text);
         }
 
         public void OnBleStateChanged(string state)
         {
             Debug.Log($"[BleClient] State: {state}");
-            OnStateChanged?.Invoke(state);
+            StateChanged?.Invoke(state);
         }
 
         public void OnBleError(string error)
         {
             Debug.LogError($"[BleClient] Error: {error}");
-            OnError?.Invoke(error);
+            Error?.Invoke(error);
         }
     }
 }
