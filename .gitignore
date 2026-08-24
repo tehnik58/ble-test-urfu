@@ -107,7 +107,8 @@ InitTestScene*.unity*
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
 
 # IDE / OS extras
-.vscode/.idea/
+.vscode/
+.idea/
 Thumbs.db
 Desktop.ini
 .DS_Store
