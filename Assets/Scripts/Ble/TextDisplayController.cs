@@ -97,11 +97,11 @@ namespace BleTest
         }
 
         private void SetTextVisible(bool visible)
-        {
+        {/*
             if (_textRoot != null)
                 _textRoot.SetActive(visible);
             else if (_textMesh != null)
-                _textMesh.gameObject.SetActive(visible);
+                _textMesh.gameObject.SetActive(visible);*/
         }
     }
 }
