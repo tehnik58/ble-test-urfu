@@ -112,3 +112,12 @@ InitTestScene*.unity*
 Thumbs.db
 Desktop.ini
 .DS_Store
+
+# PlatformIO
+firmware/.pio/
+firmware/.vscode/
+
+# Python
+__pycache__/
+*.pyc
+.venv/

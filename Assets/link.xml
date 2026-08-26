@@ -1,0 +1,7 @@
+<linker>
+  <assembly fullname="UnityEngine.AndroidJNIModule" preserve="all" />
+  <assembly fullname="UnityEngine" preserve="all">
+    <type fullname="UnityEngine.AndroidJavaClass" preserve="all" />
+    <type fullname="UnityEngine.AndroidJavaObject" preserve="all" />
+  </assembly>
+</linker>

@@ -119,13 +119,13 @@
 
 ## Этап 3 — Интеграция и приёмка (PRD п.7)
 
-- [ ] Build APK → Quest 3 → сквозной тест `Hello VR` (п.7.1–7.5)
-- [ ] Обновление текста без перезапуска приложений (п.7.6)
-- [ ] Разрыв BLE (выключить ESP32) → автопереподключение → текст снова приходит
-- [ ] `CLR` → надпись скрывается
-- [ ] UTF-8/кириллица, длинные строки
+- [x] Build APK → Quest 3 → сквозной тест `Hello VR` (п.7.1–7.5)
+- [x] Обновление текста без перезапуска приложений (п.7.6)
+- [x] Разрыв BLE (выключить ESP32) → автопереподключение → текст снова приходит
+- [x] `CLR` → надпись скрывается
+- [x] UTF-8/кириллица, длинные строки
 - [ ] Замер латентности < 300–500 мс
-- [ ] Финальные README в обоих репозиториях
+- [x] Финальные README в обоих репозиториях
 
 ---
 
@@ -143,3 +143,4 @@
 | 2026-08-24 | 2.3 | BleBridge.java (scan/connect/notify), BleClientService.cs (AndroidJavaObject wrapper) |
 | 2026-08-24 | 2.4 | BleReconnector.cs (auto-reconnect backoff), TextDisplayController.cs (TMP+status), HeadLockedText.cs (1.5m billboard) |
 | 2026-08-24 | 2.5 | AndroidManifest: BLUETOOTH_SCAN/CONNECT/CAMERA; Player Settings: Min API 29, IL2CPP, ARM64, package com.bletest.bletextviewer |
+| 2026-08-26 | 3.1 | Сквозной тест: Quest 3 → ESP32 (BLE). Были найдены и исправлены: activeInputHandler=0, link.xml для JNI, OpenXR loader/настройки, com.unity.xr.management + xr.openxr в packages, EditorBuildSettings→BleTextScene. APK собран, установлен, BLE scan→connect→notify→TextMeshPro — всё работает end-to-end. |
