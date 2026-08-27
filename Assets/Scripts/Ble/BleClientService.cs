@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Text;
 using UnityEngine;
 using UnityEngine.Android;
 
@@ -16,6 +17,9 @@ namespace BleTest
         public event Action<string> TextReceived;
         public event Action<string> StateChanged;   // "scanning", "connecting", "connected", "disconnected"
         public event Action<string> Error;
+        public event Action<int> AckReceived;        // seq number from ESP32
+        public event Action<string> RttMessageReceived;  // "RTT:<seq>,<T0>"
+        public event Action<string> ResultsReceived;     // "RESULTS:rate,avgRtt,..."
 
         private AndroidJavaObject _bridge;
         private bool _isInitialized;
@@ -139,6 +143,25 @@ namespace BleTest
 #endif
         }
 
+        public void SendAck(int seq)
+        {
+#if UNITY_ANDROID && !UNITY_EDITOR
+            if (_bridge == null) return;
+            byte[] data = Encoding.UTF8.GetBytes($"ACK:{seq}");
+            _bridge.Call("writeCharacteristic", data);
+#endif
+        }
+
+        public void StartLatencyTest(int rate)
+        {
+#if UNITY_ANDROID && !UNITY_EDITOR
+            if (_bridge == null) return;
+            byte[] data = Encoding.UTF8.GetBytes($"TEST:{rate}");
+            _bridge.Call("writeCharacteristic", data);
+            Debug.Log($"[BleClient] Latency test started: {rate} msg/sec");
+#endif
+        }
+
         private void OnDestroy()
         {
 #if UNITY_ANDROID && !UNITY_EDITOR
@@ -153,7 +176,26 @@ namespace BleTest
         public void OnTextReceived(string text)
         {
             Debug.Log($"[BleClient] Text received: {text}");
-            TextReceived?.Invoke(text);
+            if (text.StartsWith("RTT:"))
+            {
+                RttMessageReceived?.Invoke(text);
+            }
+            else if (text.StartsWith("RESULTS:"))
+            {
+                ResultsReceived?.Invoke(text);
+            }
+            else
+            {
+                TextReceived?.Invoke(text);
+            }
+        }
+
+        public void OnAckReceived(string data)
+        {
+            if (int.TryParse(data.Substring(4), out int seq))
+            {
+                AckReceived?.Invoke(seq);
+            }
         }
 
         public void OnBleStateChanged(string state)
