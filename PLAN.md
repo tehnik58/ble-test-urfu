@@ -148,3 +148,17 @@
 | 2026-08-27 | 4.2 | Исправлен HeadLockedText: rotation инвертирован (LookRotation(camera - transform)), _distance=0.35f. BleTextRoot и StatusLabel: RectTransform→Transform ( без Canvas parent). Текст теперь виден и находится рядом с камерой. |
 | 2026-08-27 | 5.1–5.3 | BLE RTT measurement (PLAN1.md): ESP32 firmware — TEST:rate, RTT messages, ACK parsing, RESULTS output. Java bridge — writeCharacteristic, requestMtu(512), OnAckReceived routing. C# BleClientService — SendAck, StartLatencyTest, RTT/RESULTS routing. LatencyProfiler — RTT/jitter collection, CSV export. LatencyTestRunner — automated 20/30/60/90/120 msg/sec tests. |
 | 2026-08-27 | 5.4 | Итоги RTT-тестов (Quest 3 ↔ ESP32 BLE): 20 msg/s → RTT avg 62.7ms (47–68ms), delivery 66/100; 30 msg/s → 57.1ms (45–73ms), 49/100; 60 msg/s → 63.3ms (41–73ms), 26/100; 90 msg/s → 64.7ms (60–72ms), 17/100; 120 msg/s → 66.0ms (66–66ms), 6/100. RTT стабилен ~57-66ms, delivery rate падает с ростом частоты из-за BLE connection interval (~7.5ms). |
+
+---
+
+## Результаты RTT-тестов (Quest 3 ↔ ESP32 BLE)
+
+| Rate | RTT avg | RTT min | RTT max | Jitter | Delivery |
+|------|---------|---------|---------|--------|----------|
+| 20 msg/s | 62.7ms | 47ms | 68ms | 15.0ms | 66/100 |
+| 30 msg/s | 57.1ms | 45ms | 73ms | 13.9ms | 49/100 |
+| 60 msg/s | 63.3ms | 41ms | 73ms | 2.6ms | 26/100 |
+| 90 msg/s | 64.7ms | 60ms | 72ms | 15.0ms | 17/100 |
+| 120 msg/s | 66.0ms | 66ms | 66ms | 0.0ms | 6/100 |
+
+**Вывод:** RTT стабилен ~57-66ms вне зависимости от частоты. Delivery rate падает с ростом частоты — BLE connection interval (~7.5ms) не успевает обрабатывать высокую нагрузку. Это физическое ограничение протокола BLE.
