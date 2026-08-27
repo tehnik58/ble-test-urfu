@@ -42,6 +42,7 @@ public class BleBridge {
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothLeScanner bleScanner;
     private BluetoothGatt bluetoothGatt;
+    private BluetoothGattCharacteristic writeCharacteristic;
     private Handler mainHandler;
     private boolean isScanning = false;
 
@@ -135,6 +136,17 @@ public class BleBridge {
         mainHandler.removeCallbacksAndMessages(null);
     }
 
+    public void writeCharacteristic(byte[] data) {
+        if (bluetoothGatt == null || writeCharacteristic == null) return;
+        try {
+            writeCharacteristic.setValue(data);
+            writeCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+            bluetoothGatt.writeCharacteristic(writeCharacteristic);
+        } catch (SecurityException e) {
+            Log.w(TAG, "Write permission denied: " + e.getMessage());
+        }
+    }
+
     // --- Scan callback ---
     private final ScanCallback scanCallback = new ScanCallback() {
         @Override
@@ -208,6 +220,17 @@ public class BleBridge {
                     descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
                     gatt.writeDescriptor(descriptor);
                 }
+
+                // Store reference for writes
+                writeCharacteristic = characteristic;
+
+                // Request larger MTU for RTT messages
+                try {
+                    gatt.requestMtu(512);
+                } catch (Exception e) {
+                    Log.w(TAG, "MTU request failed: " + e.getMessage());
+                }
+
                 sendToUnity("OnBleStateChanged", "connected");
                 Log.i(TAG, "Subscribed to notifications");
             } catch (Exception e) {
@@ -222,9 +245,18 @@ public class BleBridge {
                 if (data != null && data.length > 0) {
                     String text = new String(data, StandardCharsets.UTF_8);
                     Log.d(TAG, "Received: " + text);
-                    sendToUnity("OnTextReceived", text);
+                    if (text.startsWith("ACK:")) {
+                        sendToUnity("OnAckReceived", text);
+                    } else {
+                        sendToUnity("OnTextReceived", text);
+                    }
                 }
             }
+        }
+
+        @Override
+        public void onMtuChanged(BluetoothGatt gatt, int mtu, int status) {
+            Log.i(TAG, "MTU changed to " + mtu + " (status=" + status + ")");
         }
 
         @Override
