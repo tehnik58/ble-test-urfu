@@ -80,14 +80,16 @@ namespace BleTest
 
         private void OnRttMessage(string text)
         {
-            if (!_collecting) return;
-
             // Format: RTT:<seq>,<T0>
             string[] parts = text.Substring(4).Split(',');
             if (parts.Length < 2) return;
 
             if (int.TryParse(parts[0], out int seq) && long.TryParse(parts[1], out long t0))
             {
+                _bleService?.SendAck(seq);
+
+                if (!_collecting) return;
+
                 float unityTime = Time.realtimeSinceStartup * 1000f;
                 _currentPoints[seq] = new MeasurementPoint
                 {
@@ -95,8 +97,6 @@ namespace BleTest
                     espTimestampMs = t0,
                     unityReceivedMs = unityTime
                 };
-
-                _bleService.SendAck(seq);
             }
         }
 
