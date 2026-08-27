@@ -27,6 +27,15 @@ class ServerCallbacks : public BLEServerCallbacks {
   }
 };
 
+class CharacteristicCallbacks : public BLECharacteristicCallbacks {
+  void onWrite(BLECharacteristic *pCharacteristic) {
+    std::string value = pCharacteristic->getValue();
+    if (value.length() > 0) {
+      Serial.printf("[BLE<-] Write: %s\n", value.c_str());
+    }
+  }
+};
+
 void setup() {
   Serial.begin(115200);
   delay(1000);
@@ -41,9 +50,11 @@ void setup() {
   pCharacteristic = pService->createCharacteristic(
     CHARACTERISTIC_UUID,
     BLECharacteristic::PROPERTY_READ |
-    BLECharacteristic::PROPERTY_NOTIFY
+    BLECharacteristic::PROPERTY_NOTIFY |
+    BLECharacteristic::PROPERTY_WRITE
   );
   pCharacteristic->addDescriptor(new BLE2902());
+  pCharacteristic->setCallbacks(new CharacteristicCallbacks());
 
   pService->start();
 
